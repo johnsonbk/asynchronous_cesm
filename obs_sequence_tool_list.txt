@@ -1,0 +1,5 @@
+/glade/p/cisl/dares/Observations/WOD13/201112/obs_seq.0Z.20111227
+/glade/p/cisl/dares/Observations/WOD13/201112/obs_seq.0Z.20111228
+/glade/p/cisl/dares/Observations/WOD13/201112/obs_seq.0Z.20111229
+/glade/p/cisl/dares/Observations/WOD13/201112/obs_seq.0Z.20111230
+/glade/p/cisl/dares/Observations/WOD13/201112/obs_seq.0Z.20111231
