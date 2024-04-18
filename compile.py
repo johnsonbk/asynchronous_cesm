@@ -65,6 +65,6 @@ for i in range(0, case.size):
 database.create_timestep_record(0, case.start_year, case.start_month, case.start_day, case.start_tod, 'building')
 database.connection.close()
 
-# Create an observer chronjob
+# Create a check_database chronjob
 
-cron.create_observer_job()
+cron.create_check_database_job()

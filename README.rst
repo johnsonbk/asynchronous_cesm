@@ -81,18 +81,18 @@ responsible for doing three things:
    the build of its case.
 2. Creating the ``db.sqlite3`` database that stores the state of the experiment
    and the state of the ensemble.
-3. Initiating a cron job that runs ``observer.py`` every five minutes to check
-   on the status of the build.
+3. Initiating a cron job that runs ``check_database.py`` every five minutes to
+   check on the status of the build.
 
 ``build_single_case.py`` is submitted by ``build_ensemble.py`` and is
 responsible for creating an individual CESM case. If a build completes, it 
 updates the relevant ``status_of_XXXX`` field in the ``db.sqlite3`` database
 to record that the member has completed building.
 
-Observe file
-------------
+check_database file
+-------------------
 
-``observe.py`` is called as a cron job every five minutes. It is responsible
+``check_database.py`` is called as a cron job every five minutes. It is responsible
 for checking the ``db.sqlite3`` database to determine the status of the
 experiment.
 
@@ -116,10 +116,11 @@ Based on the status of the experiment, it does one of two things:
 
 .. important::
 
-   The observer only reads the ``db.sqlite3`` database file and either sends an
-   email or calls the controller in order to prevent a race condition. It does
-   not do any time-consuming tasks that may not be complete within the five 
-   minute interval before it gets called again as a cron job.
+   The check_database script only reads the ``db.sqlite3`` database file and
+   either sends an email or calls the controller in order to prevent a race
+   condition. It does not do any time-consuming tasks that may not be
+   complete within the five minute interval before it gets called again as
+   a cron job.
 
 Assimilate file
 ---------------

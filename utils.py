@@ -20,28 +20,29 @@ def verify_path_exists(path):
 
 class Cron:
     """
-    Contains methods to create and delete cron jobs for the observer.py script.
+    Contains methods to create and delete cron jobs for the check_database.py script.
     """
 
     def __init__(self, case):
         self.python_path = case.python_path
         self.scripts_path = case.scripts_path
 
-    def create_observer_job(self):
+    def create_check_database_job(self):
         """
-        Writes the observer job to the crontab.
+        Writes the check_database job to the crontab.
         """
         system('crontab -l > ' + self.scripts_path + '/tmp_chrontab')
         f = open(self.scripts_path + '/tmp_chrontab', 'a')
-        f.write('*/5  * * * * ' + self.python_path + ' ' + self.scripts_path + '/observer_test.py ' + case.name + '\n')
+        f.write('*/5  * * * * ' + self.python_path + ' ' + self.scripts_path + '/check_database_test.py ' + case.name + '\n')
         f.close()
         system('crontab ' + self.scripts_path + '/tmp_chrontab')
         system('rm ' + self.scripts_path + '/tmp_chrontab')
 
-    def cancel_observer_job(self):
+    def cancel_check_database_job(self):
         """
         Reads the crontab contents in f1 and writes them to f2 as long as the
-        line doesn't contain the observer, thus it "cancels" the observer job.
+        line doesn't contain the string 'check_database.py', thus it "cancels" the
+        check_database.py job.
         """
         system('crontab -l > ' + self.scripts_path + '/tmp_chrontab_1')
         f1 = open(self.scripts_path + '/tmp_chrontab_1', 'r')
@@ -49,7 +50,7 @@ class Cron:
 
         lines = f1.readlines()
         for line in lines:
-            if 'observer_test.py ' + case.name not in line:
+            if 'check_database.py ' + case.name not in line:
                 f2.write(line)
 
         f1.close()
