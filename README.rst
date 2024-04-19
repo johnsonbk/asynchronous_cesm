@@ -138,3 +138,26 @@ Integrate file
 
 If so, then integrate will submit a job to begin an integration.
 
+Test-driven development
+-----------------------
+
+Since these codes are meant to be run asynchronously on a distributed computing system, it is
+difficult to ensure whether they work as intended. Therefore a suite of comprehensive tests is
+included with the code that can be used to help ensure the code still works as intended when it is
+modified.
+
+The test suite uses Python's standard `unittest <https://docs.python.org/3/library/unittest.html>`_
+testing framework.
+
+.. note::
+
+   The syntax for Python's unittest library was originally borrowed from a different language so 
+   it uses the `camelCase <https://en.wikipedia.org/wiki/Camel_case>`_ naming convention rather than
+   instead of Python's typical use `snake_case <https://en.wikipedia.org/wiki/Snake_case>`_.
+   
+   For example the set up method is stylized as ``setUp`` instead of the using the ``set_up`` naming
+   convention commonly used in python.
+
+This suite of test scripts is included so it can run by users who alter the asyncrhonous code to
+help ensure the modified code runs as intended. For an introduction to Python's unittest library,
+watch `Corey Schafer's tutorial on YouTube <https://www.youtube.com/watch?v=6tNS--WetLI>`_.
