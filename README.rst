@@ -151,12 +151,13 @@ testing framework.
 
 .. note::
 
-   The syntax for Python's unittest library was originally borrowed from a different language so 
-   it uses the `camelCase <https://en.wikipedia.org/wiki/Camel_case>`_ naming convention rather than
-   instead of Python's typical use `snake_case <https://en.wikipedia.org/wiki/Snake_case>`_.
+   The syntax for Python's unittest library was originally borrowed from a different language known
+   as SmallTalk which used the `camelCase <https://en.wikipedia.org/wiki/Camel_case>`_ naming
+   convention instead of Python's typical use of
+   `snake_case <https://en.wikipedia.org/wiki/Snake_case>`_.
    
-   For example the set up method is stylized as ``setUp`` instead of the using the ``set_up`` naming
-   convention commonly used in python.
+   For example the "set up" method is stylized as ``setUp`` instead of the using the ``set_up``
+   naming convention commonly used in python.
 
 This suite of test scripts is included so it can run by users who alter the asyncrhonous code to
 help ensure the modified code runs as intended. For an introduction to Python's unittest library,
