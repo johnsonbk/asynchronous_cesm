@@ -98,41 +98,36 @@ class Database:
         else:
             pass
 
-    def create(self):
+    def create_tables(self):
 
-        with database as db:
+        # Create a 'case' table that contains information about the case, including its overall status
+        query = 'CREATE TABLE experiment (id INTEGER NOT NULL PRIMARY KEY, cycle INTEGER, size INTEGER, start_year INTEGER, start_month INTEGER, start_day INTEGER, start_tod INTEGER, current_year INTEGER, current_month INTEGER, current_day INTEGER, current_tod INTEGER, resubmit INTEGER, status TEXT )'
+        self.cursor.execute(query)
 
-            cursor = db.cursor
+        # Insert a row in the 'case' table to indicate that it is building
+        query = "INSERT INTO experiment (id, cycle, size, start_year, start_month, start_day, start_tod, current_year, current_month, current_day, current_tod, resubmit, status) VALUES (0, 0, " + str(self.size) +  ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", 0, 'building')"
+        self.cursor.execute(query)
 
-            # Create a 'case' table that contains information about the case, including its overall status
-            query = 'CREATE TABLE experiment (id INTEGER NOT NULL PRIMARY KEY, cycle INTEGER, size INTEGER, start_year INTEGER, start_month INTEGER, start_day INTEGER, start_tod INTEGER, current_year INTEGER, current_month INTEGER, current_day INTEGER, current_tod INTEGER, resubmit INTEGER, status TEXT )'
-            cursor.execute(query)
+        # Create a 'cycles' table that contains the status of each ensemble member at each timestep
+        query = 'CREATE TABLE cycles (cycle INTEGER NOT NULL PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, tod INTEGER'
 
-            # Insert a row in the 'case' table to indicate that it is building
-            query = "INSERT INTO experiment (id, cycle, size, start_year, start_month, start_day, start_tod, current_year, current_month, current_day, current_tod, resubmit, status) VALUES (0, 0, " + str(self.size) +  ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", 0, 'building')"
-            cursor.execute(query)
+        for this_member in self.members:
+            print('this_member.string', this_member.string)
+            member_string = ', status_of_' + this_member.string + ' TEXT'
+            query += member_string
 
-            # Create a 'cycles' table that contains the status of each ensemble member at each timestep
-            query = 'CREATE TABLE cycles (cycle INTEGER NOT NULL PRIMARY KEY, year INTEGER, month INTEGER, day INTEGER, tod INTEGER'
+        query += ')'
+        self.cursor.execute(query)
 
-            for this_member in self.members:
-                member_string = ', status_of_' + this_member.string + ' TEXT'
-                query += member_string
-
-            query += ')'
-            cursor.execute(query)
-
-            self.print_query(query)
-
-            self.connection.commit()
+        self.connection.commit()
     
-    def create_timestep_record(self, cycle, year, month, day, tod, status):
+    def insert_cycle_record(self, cycle, year, month, day, tod, status):
         query = "INSERT INTO cycles (cycle, year, month, day, tod"
 
         for this_member in self.members:
-            query += ", status_of_" + this_member
+            query += ", status_of_" + this_member.string
 
-        query += ") VALUES ("+str(cycle) + ", " + year + ", " + month + ", " + day + ", " + tod
+        query += ") VALUES ("+str(cycle) + ", " + str(year) + ", " + str(month) + ", " + str(day) + ", " + str(tod)
 
         for this_member in self.members:
             query += ", '" + status + "' "
@@ -147,11 +142,11 @@ class Database:
     
         return
 
-    def get_record_by_timestamp(self, year, month, day, tod):
+    def select_cycle_record_by_timestamp(self, year, month, day, tod):
 
         # This gets the newest record with a given timestamp. In general, each record
         # will have a unique timestamp, except cycles 0 and 1 which should have the same timestamp.
-        query = "SELECT * FROM cycles WHERE year = " + year + " AND month = " + month + " AND " + "day = " + day + " AND tod = " + tod + " ORDER BY cycle DESC"
+        query = "SELECT * FROM cycles WHERE year = " + str(year) + " AND month = " + str(month) + " AND " + "day = " + str(day) + " AND tod = " + str(tod) + " ORDER BY cycle DESC"
         
         self.print_query(query)
 
@@ -161,16 +156,7 @@ class Database:
 
         return record
 
-    def get_cycle_year_month_day_tod_resubmit_status_of_case(self):
-        query = "SELECT cycle, current_year, current_month, current_day, current_tod, resubmit, status FROM experiment WHERE id = 0"
-
-        cursor = self.connection.cursor()
-        cursor.execute(query)
-        record = cursor.fetchone()
-
-        return record[0], record[1], record[2], record[3], record[4], record[5], record[6] 
-
-    def get_status_of_member(self, cycle, member):
+    def select_member_status_in_cycle_record(self, cycle, member):
 
         query = "SELECT status_of_" + str(member).zfill(4) + " FROM cycles WHERE cycle = " + str(cycle)
         self.print_query(query)
@@ -181,9 +167,19 @@ class Database:
 
         return record[0]
 
-    def update_status_of_experiment(self, cycle, resubmit, status):
+    def select_experiment_record(self):
 
-        query = "UPDATE experiment SET cycle = " + str(cycle) + ", resubmit = " + resubmit + ", status = " + status + " WHERE id = 0"
+        query = "SELECT * from experiment WHERE id = 0"
+
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        record = cursor.fetchone()
+
+        return record
+
+    def update_status_in_experiment_record(self, cycle, resubmit, status):
+
+        query = "UPDATE experiment SET cycle = " + str(cycle) + ", resubmit = " + str(resubmit) + ", status = '" + status + "' WHERE id = 0"
         
         self.print_query(query)
 
@@ -193,9 +189,9 @@ class Database:
 
         return
 
-    def update_status_of_member(self, cycle, member, status):
+    def update_member_status_in_cycle_record(self, cycle, member, status):
 
-        query = "UPDATE cycles SET status_of_" + str(member).zfill(4) + " = '" + status + "' WHERE cycle = " + str(cycle)
+        query = "UPDATE cycles SET status_of_" + member + " = '" +status + "' WHERE cycle = " + str(cycle)
         
         self.print_query(query)
 
@@ -205,7 +201,7 @@ class Database:
 
         return
 
-    def get_status_of_members(self, cycle):
+    def select_all_member_statuses_in_cycle_record(self, cycle):
         # This method returns a dictionary where the keys are the member string
         # for each member of the ensemble and the values are the status of 
         # that member.
@@ -213,9 +209,9 @@ class Database:
         query = "SELECT "
         for imember, this_member in enumerate(self.members):
             if imember+1 != self.size:
-                query += "status_of_" + this_member + ", "
+                query += "status_of_" + this_member.string + ", "
             else:
-                query += "status_of_" + this_member + " "
+                query += "status_of_" + this_member.string + " "
         
         query += " FROM cycles WHERE cycle  = " + str(cycle)
         
@@ -230,7 +226,7 @@ class Database:
         statuses = {}
 
         for imember, this_member in enumerate(self.members):
-            statuses[this_member] = record[imember]
+            statuses["status_of_"+this_member.string] = record[imember]
 
         return statuses
 
