@@ -162,3 +162,20 @@ testing framework.
 This suite of test scripts is included so it can run by users who alter the asyncrhonous code to
 help ensure the modified code runs as intended. For an introduction to Python's unittest library,
 watch `Corey Schafer's tutorial on YouTube <https://www.youtube.com/watch?v=6tNS--WetLI>`_.
+
+``test_utils.py``
+~~~~~~~~~~~~~~~~~
+
+.. warning::
+
+   If you have never run a cron job on the same system that the test suite is
+   being conducted upon, the cron test may fail because your account does not 
+   have a crontab associated with it yet. In order to create a crontab, log 
+   onto the system via a terminal window and type:
+
+   .. code-block::
+
+      crontab -e
+
+   You'll be prompted to select a text editor and an empty file will open. Save
+   the file.
