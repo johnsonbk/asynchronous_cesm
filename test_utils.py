@@ -7,6 +7,15 @@ from config import case
 import os
 import time
 
+class TestGit(unittest.TestCase):
+    """
+    Test whether git is installed on your system.
+    """
+
+    def test_git(self):
+        result = os.system('git -v')
+        self.assertEqual(result, 0)
+
 class TestCron(unittest.TestCase):
     """
     Test the cron class by creating a new cronjob in the crontab to run the
