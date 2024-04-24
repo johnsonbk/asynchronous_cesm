@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import unittest
 from utils import cron, database, members
-from config import case
+from config import experiment
 import os
 import time
 
@@ -35,7 +35,7 @@ class TestCron(unittest.TestCase):
         test_duration_in_minutes = 1
         seconds_per_minute = 60
         script = 'write_time_to_file.py'
-        output_file = case.scripts_path + '/times_written_to_file.txt'
+        output_file = experiment.scripts_path + '/times_written_to_file.txt'
         # Create an empty file that can be read even if
         # ``test_duration_in_minutes = 0``.
         open(output_file, 'w').close()

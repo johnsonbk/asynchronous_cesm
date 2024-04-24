@@ -10,7 +10,7 @@ import sqlite3
 from smtplib import SMTP
 from email.mime.text import MIMEText
 
-from config import case, members
+from config import experiment, members
 
 def verify_path_exists(path):
     from os.path import isdir
@@ -23,11 +23,11 @@ class Cron:
     Contains methods to create and delete cron jobs for the check_database.py script.
     """
 
-    def __init__(self, case):
-        self.python_path = case.python_path
-        self.scripts_path = case.scripts_path
+    def __init__(self, experiment):
+        self.python_path = experiment.python_path
+        self.scripts_path = experiment.scripts_path
 
-    def create_job(self, minutes='5', script='check_database.py', experiment=case.name):
+    def create_job(self, minutes='5', script='check_database.py', experiment=experiment.name):
         """
         Given the minutes, script name and experiment, writes a job to the
         crontab.
@@ -39,7 +39,7 @@ class Cron:
         system('crontab ' + self.scripts_path + '/tmp_chrontab')
         system('rm ' + self.scripts_path + '/tmp_chrontab')
 
-    def cancel_job(self, script='check_database.py', experiment=case.name):
+    def cancel_job(self, script='check_database.py', experiment=experiment.name):
         """
         Reads the crontab contents in f1 and writes them to f2 unless the line
         contains the script and experiment strings. If the line does contain 
@@ -71,15 +71,15 @@ class Database:
     terminate the connection to the sqlite database.
     """
 
-    def __init__(self, case, members):
-        self.name = case.caseroot + '/' + 'sqlite3.db'
-        self.size = case.size
+    def __init__(self, experiment, members):
+        self.name = experiment.caseroot + '/' + 'sqlite3.db'
+        self.size = experiment.size
         self.members = members
-        self.start_year = case.start_year
-        self.start_month = case.start_month
-        self.start_day = case.start_day
-        self.start_tod = case.start_tod
-        self.debug = case.debug
+        self.start_year = experiment.start_year
+        self.start_month = experiment.start_month
+        self.start_day = experiment.start_day
+        self.start_tod = experiment.start_tod
+        self.debug = experiment.debug
 
     def __enter__(self):
         self.connection = sqlite3.connect(self.name)
@@ -102,11 +102,11 @@ class Database:
 
     def create_tables(self):
 
-        # Create a 'case' table that contains information about the case, including its overall status
+        # Create a 'experiment' table that contains information about the experiment, including its overall status
         query = 'CREATE TABLE experiment (id INTEGER NOT NULL PRIMARY KEY, cycle INTEGER, size INTEGER, start_year INTEGER, start_month INTEGER, start_day INTEGER, start_tod INTEGER, current_year INTEGER, current_month INTEGER, current_day INTEGER, current_tod INTEGER, resubmit INTEGER, status TEXT )'
         self.cursor.execute(query)
 
-        # Insert a row in the 'case' table to indicate that it is building
+        # Insert a row in the 'experiment' table to indicate that it is building
         query = "INSERT INTO experiment (id, cycle, size, start_year, start_month, start_day, start_tod, current_year, current_month, current_day, current_tod, resubmit, status) VALUES (0, 0, " + str(self.size) +  ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", " + str(self.start_year) + ", " + str(self.start_month) + ", " + str(self.start_day) + ", " + str(self.start_tod) + ", 0, 'building')"
         self.cursor.execute(query)
 
@@ -239,8 +239,8 @@ class Message:
     experiment.
     """
 
-    def __init__(self, case):
-        self.email_address = case.email_address
+    def __init__(self, experiment):
+        self.email_address = experiment.email_address
     
     def send(self, subject, content):
 
@@ -255,6 +255,6 @@ class Message:
         # s.send_message(msg)
         s.quit()
 
-cron = Cron(case)
-database = Database(case, members)
-message = Message(case)
+cron = Cron(experiment)
+database = Database(experiment, members)
+message = Message(experiment)

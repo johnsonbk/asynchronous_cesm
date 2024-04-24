@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import os
 import sys
-from config import case, members
+from config import experiment, members
 from utils import database, message, verify_path_exists
 
 # ---------------------
@@ -18,20 +18,20 @@ member = members[imember-1]
 
 # The main_name is a directory that contains the single cases that comprise
 # the ensemble.
-print('case', case.name)
+print('case', experiment.name)
 print('member.caseroot', member.caseroot)
 
 # os.system('mkdir '+case.caseroot)
 
-create_newcase_command = case.cimeroot + '/scripts/create_newcase' + \
+create_newcase_command = experiment.cimeroot + '/scripts/create_newcase' + \
     ' --case ' + member.caseroot + \
-    ' --machine ' + case.machine + \
-    ' --res ' + case.resolution + \
-    ' --project ' + case.project + \
-    ' --queue ' + case.queue + \
-    ' --walltime ' + case.walltime + \
-    ' --pecount ' + str(case.use_tasks_per_node * case.nthreads) + \
-    case.compset_args
+    ' --machine ' + experiment.machine + \
+    ' --res ' + experiment.resolution + \
+    ' --project ' + experiment.project + \
+    ' --queue ' + experiment.queue + \
+    ' --walltime ' + experiment.walltime + \
+    ' --pecount ' + str(experiment.use_tasks_per_node * experiment.nthreads) + \
+    experiment.compset_args
 
 print('create_newcase_command', create_newcase_command)
 
@@ -43,35 +43,35 @@ except:
 # Configure the case
 
 member.xml_change('RUN_TYPE=hybrid')
-member.xml_change('RUN_STARTDATE='+case.start_year+'-'+case.start_month+'-'+case.start_day)
-member.xml_change('START_TOD='+case.start_tod)
-member.xml_change('RUN_REFCASE='+case.ref_case)
-member.xml_change('RUN_REFTOD='+case.ref_date)
+member.xml_change('RUN_STARTDATE='+experiment.start_year+'-'+experiment.start_month+'-'+experiment.start_day)
+member.xml_change('START_TOD='+experiment.start_tod)
+member.xml_change('RUN_REFCASE='+experiment.ref_case)
+member.xml_change('RUN_REFTOD='+experiment.ref_date)
 member.xml_change('GET_REFCASE=FALSE')
-member.xml_change('CIME_OUTPUT_ROOT='+case.scratchroot)
+member.xml_change('CIME_OUTPUT_ROOT='+experiment.scratchroot)
 member.xml_change('CONTINUE_RUN=FALSE')
-member.xml_change('STOP_OPTION='+case.stop_option)
-member.xml_change('STOP_N='+case.stop_n)
+member.xml_change('STOP_OPTION='+experiment.stop_option)
+member.xml_change('STOP_N='+experiment.stop_n)
 member.xml_change('RESUBMIT=0')
 
-if case.short_term_archiver == 'off':
+if experiment.short_term_archiver == 'off':
     member.xml_change('DOUT_S=FALSE')
 else:
     member.xml_change('DOUT_S=TRUE')
 
-member.xml_change('DOUT_S_ROOT='+case.archdir)
+member.xml_change('DOUT_S_ROOT='+experiment.archdir)
 
 member.xml_change('DEBUG=FALSE')
 member.xml_change('INFO_DBUG=0')
 
-print('case.sourcemods', case.sourcemods)
-os.system('ls '+case.sourcemods)
-if path_exists(case.sourcemods):
-    os.system('cp -R ' + case.sourcemods + '/* ' + member.caseroot + '/SourceMods')
+print('experiment.sourcemods', experiment.sourcemods)
+os.system('ls '+experiment.sourcemods)
+if path_exists(experiment.sourcemods):
+    os.system('cp -R ' + experiment.sourcemods + '/* ' + member.caseroot + '/SourceMods')
 else:
     print('No SourceMods for this case.')
 
-member.xml_change('RUN_REFDIR=' + case.ref_stage_dir)
+member.xml_change('RUN_REFDIR=' + experiment.ref_stage_dir)
 
 os.system('cd ' + member_root)
 
@@ -331,7 +331,7 @@ f.write(user_nl_datm)
 f.close()
 
 user_nl_cice = """
-ice_ic = '""" + member.rundir + """/""" + case.ref_case + """.cice_"""+ member.string + """.r.""" + case.ref_timestamp + """.nc'
+ice_ic = '""" + member.rundir + """/""" + experiment.ref_case + """.cice_"""+ member.string + """.r.""" + experiment.ref_timestamp + """.nc'
 """
 f = open(member.caseroot+"/user_nl_cice", "a")
 f.write(user_nl_cice)
@@ -362,57 +362,57 @@ CONTINUE_RUN from env_run.xml is """ + continue_run
 
 if continue_run == 'TRUE':
     print_string += " so files for some later step than the initial one will be restaged.\n"
-    print_string += "Date to reset files to is: " + case.restart_timestamp
+    print_string += "Date to reset files to is: " + experiment.restart_timestamp
 else:
     print_string += " so files for the initial step of this experiment will be restaged.\n"
-    print_string += "Date to reset files to is: " + case.start_timestamp
+    print_string += "Date to reset files to is: " + experiment.start_timestamp
 
 print(print_string)
 
 if continue_run == 'TRUE':
-    print("Staging restart files for run date/time: " + case.restart_timestamp)
+    print("Staging restart files for run date/time: " + experiment.restart_timestamp)
 
     if archived == 'TRUE':
     
         # Check if the stage directory exists
-        verify_path_exists(case.restart_dir)
+        verify_path_exists(experiment.restart_dir)
         os.system('cp ' + member.restart_dir + '/*' + member.string + '* ' + member.rundir)
 
     else:
 
         with open(member.caseroot + '/rpointer.atm', 'w') as f:
-            f.write(case.name + '.datm_' + member.string + '.r.' + case.restart_timestamp + '.nc\n')
-            f.write(case.name + '.datm_' + member.string + '.rs1.' + case.restart_timestamp + '.bin\n')
+            f.write(experiment.name + '.datm_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
+            f.write(experiment.name + '.datm_' + member.string + '.rs1.' + experiment.restart_timestamp + '.bin\n')
 
         with open(member.caseroot + '/rpointer.rof', 'w') as f:
-            f.write(case.name + '.drof_' + member.string + '.r.' + case.restart_timestamp + '.nc\n')
-            f.write(case.name + '.drof_' + member.string + '.rs1.' + case.restart_timestamp + '.bin\n')
+            f.write(experiment.name + '.drof_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
+            f.write(experiment.name + '.drof_' + member.string + '.rs1.' + experiment.restart_timestamp + '.bin\n')
 
         with open(member.caseroot + '/rpointer.ice', 'w') as f:
-            f.write(case.name + '.cice_' + member.string + '.r.' + case.restart_timestamp + '.nc\n')
-            f.write(case.name + '.drof_' + member.string + '.rs1.' + case.restart_timestamp + '.nc\n')
+            f.write(experiment.name + '.cice_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
+            f.write(experiment.name + '.drof_' + member.string + '.rs1.' + experiment.restart_timestamp + '.nc\n')
 
         # The ovf restart is only needed for the low-resolution g17 run
-        if 'g17' in case.resolution:
+        if 'g17' in experiment.resolution:
             with open(member.caseroot + '/rpointer.ocn.ovf', 'w') as f:
-                f.write(case.name + '.pop_' + member.string + '.ro.' + case.restart_timestamp)
+                f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.restart_timestamp)
 
         with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
-            f.write(case.name + '.pop_' + member.string + '.r.' + case.restart_timestamp + '.nc\n')
+            f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write('RESTART_FMT=nc')
         
         if os.path.isfile(member.caseroot + '/rpointer.ocn.tavg'):
             with open(member.caseroot + '/rpointer.ocn.tavg', 'w') as f:
-                f.write(case.name + '.pop_' + member.string + '.rh.' + case.restart_timestamp + '.nc')
+                f.write(experiment.name + '.pop_' + member.string + '.rh.' + experiment.restart_timestamp + '.nc')
 
         if os.path.isfile(member.caseroot + '/rpointer.ocn.tavg2'):
             with open(member.caseroot + '/rpointer.ocn.tavg2', 'w') as f:
-                f.write(case.name + '.pop_' + member.string + '.rh.nday1.' + case.restart_timestamp + '.nc')
+                f.write(experiment.name + '.pop_' + member.string + '.rh.nday1.' + experiment.restart_timestamp + '.nc')
 
         with open(member.caseroot + '/rpointer.drv', 'w') as f:
-            f.write(case.name + '.cpl.r.' + case.restart_timestamp + '.nc')
+            f.write(experiment.name + '.cpl.r.' + experiment.restart_timestamp + '.nc')
 
-    print('All files reset to rerun experiment step for time ' + case.restart_timestamp + '.')
+    print('All files reset to rerun experiment step for time ' + experiment.restart_timestamp + '.')
 
 # Else CONTINUE_RUN == 'FALSE'
 else:
@@ -426,18 +426,18 @@ else:
     print('Staging initial files for instance ' + member.string)
 
     # The cice fname must match that in the user_nl_cice file
-    os.system('ln ' + case.ref_stage_dir + '/' + case.ref_case + '.cice_' + member.string + '.r.' + case.start_timestamp + '.nc')
-    os.system('ln ' + case.ref_stage_dir + '/' + case.ref_case + '.pop_' + member.string + '.r.' + case.start_timestamp + '.nc')
-    os.system('ln ' + case.ref_stage_dir + '/' + case.ref_case + '.pop_' + member.string + '.ro.' + case.start_timestamp)
+    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
+    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
+    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
     
     with open(member.caseroot + '/rpointer.ocn.ovf', 'w') as f:
-        f.write(case.name + '.pop_' + member.string + '.ro.' + case.start_timestamp)
+        f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
 
     with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
-        f.write(case.name + '.pop_' + member.string + '.r.' + case.start_timestamp + '.nc\n')
+        f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc\n')
         f.write('RESTART_FMT=nc')   
 
-    print('All files set to run the FIRST experiment step at time' + case.start_timestamp)
+    print('All files set to run the FIRST experiment step at time' + experiment.start_timestamp)
 
 # ==============================================================================
 #
@@ -456,7 +456,7 @@ print('1. Use preview_namelists to obtain the contents of the stream txt files')
 print('in CaseDocs, and then place a copy of the modified stream txt file in')
 print(member.caseroot + ' with the string user_ prepended, and')
 print('2. Copy a template stream txt file from this directory:')
-print(case.dartroot + '/models/POP/shell_scripts/' + case.cesmtagmajor)
+print(experiment.dartroot + '/models/POP/shell_scripts/' + experiment.cesmtagmajor)
 print('and modify one for each instance.')
 
 os.system(member.caseroot + '/preview_namelists')

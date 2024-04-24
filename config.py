@@ -66,10 +66,12 @@ class Member:
         chdir(self.caseroot)
         return check_output('./xmlquery ' + key + ' --value', shell=True).decode('utf-8')
 
-class Case:
-    """The Case class is essentially used as a namelist. Some dictators of python style suggest that this type of data
-    should be stored as key/value pairs in a dictionary instead of using an object. However we're using an object so
-    that the syntax is more uniform throughout the scripts."""
+class Experiment:
+    """The Experiment class is essentially used as a namelist. Some dictators
+    of python style suggest that this type of data should be stored as
+    key/value pairs in a dictionary instead of using an object. However we're
+    using an object so that the syntax is more uniform throughout the
+    scripts."""
     def __init__(self):
         # Case config
         self.name = 'GIAF'
@@ -127,7 +129,6 @@ class Case:
         self.queue = 'main'
         self.walltime = '04:00:00'
 
-
-case = Case()
+experiment = Experiment()
 # Use a list comprehension for members
-members = [Member(index+1, case) for index in range(0, case.size)]
+members = [Member(index+1, experiment) for index in range(0, experiment.size)]

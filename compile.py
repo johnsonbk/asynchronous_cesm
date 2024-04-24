@@ -2,15 +2,11 @@
 from __future__ import print_function
 
 import os
-from config import case
+from config import experiment
 from utils import cron, database
 
-if not os.path.exists(case.root):
-    os.system('mkdir -p ' + case.root)
-
-# Create an sqlite database to store the status of the ensemble
-
-database.create()
+if not os.path.exists(experiment.root):
+    os.system('mkdir -p ' + experiment.root)
 
 # Declare a job string
 
@@ -40,19 +36,19 @@ job_string = """#!/bin/bash -l
 {}
 """
 
-# Build a case
+# Build a single case
 
-for i in range(0, case.size):
+for i in range(0, experiment.size):
 
     instance = str(i+1).zfill(4)
 
-    job_name = case.name + "_" + instance
+    job_name = experiment.name + "_" + instance
     job_filename = 'job_scripts/' + job_name + '.sh'
 
     job_command = 'python ./compile_single.py ' + instance
 
     f = open(job_filename, "w")
-    f.write(job_string.format(job_name, case.project, user_email, load_environment, job_command))
+    f.write(job_string.format(job_name, experiment.project, user_email, load_environment, job_command))
     f.close()
 
     run_command = 'qsub ./' + job_filename
@@ -62,8 +58,8 @@ for i in range(0, case.size):
 # Now that all the batch jobs have been submitted, create a default record
 # in the database for this ensemble
 
-database.create_timestep_record(0, case.start_year, case.start_month, case.start_day, case.start_tod, 'building')
-database.connection.close()
+with database as db:
+    db.create_timestep_record(0, experiment.start_year, experiment.start_month, experiment.start_day, experiment.start_tod, 'building')
 
 # Create a check_database chronjob
 
