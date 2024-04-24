@@ -3,12 +3,56 @@ from __future__ import print_function
 
 import unittest
 from utils import cron, database, members
+from config import case
 import os
+import time
 
 class TestCron(unittest.TestCase):
-    pass
+    """
+    Test the cron class by creating a new cronjob in the crontab to run the
+    ``write_time_to_file.py`` script. Whenever that script is run, it simply
+    writes the current time to the text file specified by the ``output_file``
+    variable. The cron job is run once a minute and the test is paused for 
+    a set number of minutes, specified by the ``test_duration_in_minutes``
+    variable. If the number of lines in the ``output_file`` matches the number
+    of minutes the test has been paused then the test passes.
+
+    If you have already ensured that cron works on your system and are running
+    the test suite multiple times and don't want to wait for test_cron to pass
+    each time, set ``test_duration_in_minutes = 0`` and the test will pass.
+    """
+    
+    def test_cron(self):
+        test_duration_in_minutes = 1
+        seconds_per_minute = 60
+        script = 'write_time_to_file.py'
+        output_file = case.scripts_path + '/times_written_to_file.txt'
+        # Create an empty file that can be read even if
+        # ``test_duration_in_minutes = 0``.
+        open(output_file, 'w').close()
+
+        print('Running test_cron, which will pause test_utils.py for ' + str(test_duration_in_minutes) + ' minute(s).')
+        
+        if test_duration_in_minutes != 0:
+            # Create a cron job that is run every minute
+            cron.create_job(1, script, output_file)
+
+            time.sleep(test_duration_in_minutes*seconds_per_minute)
+
+            cron.cancel_job(script, output_file)
+
+        with open(output_file, mode='r') as file:
+            nlines = len(file.readlines())
+
+        os.remove(output_file)
+        self.assertEqual(test_duration_in_minutes, nlines)
 
 class TestDatabase(unittest.TestCase):
+    """
+    Test the database class by creating a test database, inserting records into
+    it, selecting a subset of these records, updating the selected records and
+    inserting them back into the test database.
+    """
 
     @classmethod
     def setUpClass(cls):
@@ -23,7 +67,6 @@ class TestDatabase(unittest.TestCase):
     def tearDownClass(cls):
         print('Removing database saved in ' + database.name)
         os.remove(database.name)
-
         
     def test_database(self):
 
@@ -80,24 +123,3 @@ class TestDatabase(unittest.TestCase):
     
 if __name__ == '__main__':
     unittest.main()
-
-#setUp()
-    
-#tearDown()
-    
-#setUpClass()
-    
-#tearDownClass()
-
-# assertEqual(a, b)
-# assertNotEqual(a, b)
-# assertTrue(x)
-# assertFalse(x)
-# assertIs(a, b)
-# assertIsNot(a, b)
-# assertIsNone(x)
-# assertIsNotNone(x)
-# assertIn(a, b)
-# assertNotIn(a, b)
-# assertIsInstance(a, b)
-# assertNotIsInstance(a, b)

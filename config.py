@@ -106,8 +106,8 @@ class Case:
         self.use_tasks_per_node = 128
         self.nthreads = 1
         self.archdir = self.scratchroot + '/' + self.name + '/archive'
-        self.python_path = '/glade/u/home/johnsonb/miniconda2/bin/python'
-        self.scripts_path = '/glade/u/home/johnsonb/dart_python_scripts/asynchronous_ensembles'
+        self.python_path = '/opt/local/bin/python'
+        self.scripts_path = '/Users/johnsonb/work/git/asynchronous_cesm'
         # DATM
         self.stream_year_align = 2011
         self.stream_year_first = 2011

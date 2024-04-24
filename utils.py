@@ -27,22 +27,24 @@ class Cron:
         self.python_path = case.python_path
         self.scripts_path = case.scripts_path
 
-    def create_check_database_job(self):
+    def create_job(self, minutes='5', script='check_database.py', experiment=case.name):
         """
-        Writes the check_database job to the crontab.
+        Given the minutes, script name and experiment, writes a job to the
+        crontab.
         """
         system('crontab -l > ' + self.scripts_path + '/tmp_chrontab')
         f = open(self.scripts_path + '/tmp_chrontab', 'a')
-        f.write('*/5  * * * * ' + self.python_path + ' ' + self.scripts_path + '/check_database_test.py ' + case.name + '\n')
+        f.write('*/' + str(minutes) + ' * * * * ' + self.python_path + ' ' + self.scripts_path + '/' + script + ' ' + experiment + '\n')
         f.close()
         system('crontab ' + self.scripts_path + '/tmp_chrontab')
         system('rm ' + self.scripts_path + '/tmp_chrontab')
 
-    def cancel_check_database_job(self):
+    def cancel_job(self, script='check_database.py', experiment=case.name):
         """
-        Reads the crontab contents in f1 and writes them to f2 as long as the
-        line doesn't contain the string 'check_database.py', thus it "cancels" the
-        check_database.py job.
+        Reads the crontab contents in f1 and writes them to f2 unless the line
+        contains the script and experiment strings. If the line does contain 
+        these strings, they are not written to f2, which cancels that
+        particular job.
         """
         system('crontab -l > ' + self.scripts_path + '/tmp_chrontab_1')
         f1 = open(self.scripts_path + '/tmp_chrontab_1', 'r')
@@ -50,7 +52,7 @@ class Cron:
 
         lines = f1.readlines()
         for line in lines:
-            if 'check_database.py ' + case.name not in line:
+            if script + ' ' + experiment not in line:
                 f2.write(line)
 
         f1.close()
