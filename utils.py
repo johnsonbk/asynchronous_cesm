@@ -12,7 +12,11 @@ from email.mime.text import MIMEText
 
 from config import experiment, members
 
+def verify_path_exists(path):
+    from os.path import isdir
 
+    if not isdir(path):
+        raise OSError('Path does not exist: ' + path)
 
 class Cron:
     """

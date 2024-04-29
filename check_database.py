@@ -4,9 +4,13 @@ from __future__ import print_function
 from utils import database
 
 # Check the status of the experiment
+with database as db:
+    experiment_record = db.select_experiment_record()
 
 if experiment_record['status'] == 'building':
-    pass
+    with database as db:
+        db.select_all_member_statuses_in_cycle_record(experiment_record['cycle'])
+
 elif experiment_record['status'] == 'failed building':
     pass
 elif experiment_record['status'] == 'completed building':

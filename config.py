@@ -108,8 +108,8 @@ class Experiment:
         self.use_tasks_per_node = 128
         self.nthreads = 1
         self.archdir_path = self.scratchroot_path + '/' + self.name + '/archive'
-        self.python_bin = '/opt/local/bin/python'
-        self.scripts_path = '/Users/johnsonb/work/git/asynchronous_cesm'
+        self.python_bin = '/glade/u/home/johnsonb/miniconda2/bin/python'
+        self.scripts_path = '/glade/work/johnsonb/git/asynchronous_cesm'
         # DATM
         self.stream_year_align = 2011
         self.stream_year_first = 2011

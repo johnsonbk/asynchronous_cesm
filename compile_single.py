@@ -19,12 +19,10 @@ member = members[imember-1]
 # The main_name is a directory that contains the single cases that comprise
 # the ensemble.
 print('case', experiment.name)
-print('member.caseroot', member.caseroot)
+print('member.caseroot_path', member.caseroot_path)
 
-# os.system('mkdir '+case.caseroot)
-
-create_newcase_command = experiment.cimeroot + '/scripts/create_newcase' + \
-    ' --case ' + member.caseroot + \
+create_newcase_command = experiment.cimeroot_path + '/scripts/create_newcase' + \
+    ' --case ' + member.caseroot_path + \
     ' --machine ' + experiment.machine + \
     ' --res ' + experiment.resolution + \
     ' --project ' + experiment.project + \
@@ -48,7 +46,7 @@ member.xml_change('START_TOD='+experiment.start_tod)
 member.xml_change('RUN_REFCASE='+experiment.ref_case)
 member.xml_change('RUN_REFTOD='+experiment.ref_date)
 member.xml_change('GET_REFCASE=FALSE')
-member.xml_change('CIME_OUTPUT_ROOT='+experiment.scratchroot)
+member.xml_change('CIME_OUTPUT_ROOT='+experiment.scratchroot_path)
 member.xml_change('CONTINUE_RUN=FALSE')
 member.xml_change('STOP_OPTION='+experiment.stop_option)
 member.xml_change('STOP_N='+experiment.stop_n)
@@ -59,14 +57,14 @@ if experiment.short_term_archiver == 'off':
 else:
     member.xml_change('DOUT_S=TRUE')
 
-member.xml_change('DOUT_S_ROOT='+experiment.archdir)
+member.xml_change('DOUT_S_ROOT='+experiment.archdir_path)
 
 member.xml_change('DEBUG=FALSE')
 member.xml_change('INFO_DBUG=0')
 
-print('experiment.sourcemods', experiment.sourcemods)
-os.system('ls '+experiment.sourcemods)
-if path_exists(experiment.sourcemods):
+print('experiment.sourcemods', experiment.sourcemods_path)
+os.system('ls '+experiment.sourcemods_path)
+if path_exists(experiment.sourcemods_path):
     os.system('cp -R ' + experiment.sourcemods + '/* ' + member.caseroot + '/SourceMods')
 else:
     print('No SourceMods for this case.')
@@ -478,9 +476,7 @@ for f in files:
     elif '.Precip_' in f:
         print('Precipitation in user_datm.streams.txt.CPLHISTForcing.nonSolarFlux - not ' + f)
     else:
-        # ${COPY} $FILE user_${FNAME}
-        # chmod   644   user_${FNAME}
-
+        print('Double check that ' + f + ' has been written')
 
 #    switch ( ${FNAME} )
 #       case *presaero*:
@@ -504,29 +500,27 @@ for f in files:
 # conditions for a default year and modify the instance number.
 # The stream files for POP have no leading zeros in the instance number.
 
-print("\nReplacing each default stream txt file with one that uses CAM DATM\n")
+# print("\nReplacing each default stream txt file with one that uses CAM DATM\n")
+# foreach FNAME (user*streams*)
+#    set name_parse = `echo ${FNAME} | sed 's/\_/ /g'`
+#    @ instance_index = $#name_parse
+#    @ filename_index = $#name_parse - 1
+#    set streamname = $name_parse[$filename_index]
+#    set   instance = `echo $name_parse[$instance_index] | bc`
+#    set   string_instance = `printf %04d ${instance}`
 
+#    if (-e $DARTROOT/models/POP/shell_scripts/$cesmtagmajor/user_$streamname*template) then
 
-foreach FNAME (user*streams*)
-   set name_parse = `echo ${FNAME} | sed 's/\_/ /g'`
-   @ instance_index = $#name_parse
-   @ filename_index = $#name_parse - 1
-   set streamname = $name_parse[$filename_index]
-   set   instance = `echo $name_parse[$instance_index] | bc`
-   set   string_instance = `printf %04d ${instance}`
+#       echo "Copying DART template for ${FNAME} and changing instances."
 
-   if (-e $DARTROOT/models/POP/shell_scripts/$cesmtagmajor/user_$streamname*template) then
+#       ${COPY} $DARTROOT/models/POP/shell_scripts/$cesmtagmajor/user_$streamname*template ${FNAME}
 
-      echo "Copying DART template for ${FNAME} and changing instances."
+#       sed s/NINST/${string_instance}/g ${FNAME} >! out.$$
+#       ${MOVE} out.$$ ${FNAME}
 
-      ${COPY} $DARTROOT/models/POP/shell_scripts/$cesmtagmajor/user_$streamname*template ${FNAME}
-
-      sed s/NINST/${string_instance}/g ${FNAME} >! out.$$
-      ${MOVE} out.$$ ${FNAME}
-
-   else:
-      print("DIED Looking for a DART stream txt template for " + ${FNAME})
-      print("DIED Looking for a DART stream txt template for " + ${FNAME})
+#    else:
+#       print("DIED Looking for a DART stream txt template for " + ${FNAME})
+#       print("DIED Looking for a DART stream txt template for " + ${FNAME})
 
 
 # ==============================================================================
@@ -542,11 +536,10 @@ member.git_init()
 member.git_commit()
 
 if build_successful:
-    database.update_status_of_member(0, member.string, 'build completed')
+    database.update_status_of_member(0, member.string, 'completed building')
 
 else:
-    database.update_status_of_member(0, member.string, 'build failed')
-
+    database.update_status_of_member(0, member.string, 'failed building')
 
 # ==============================================================================
 # Checking the case.
@@ -597,14 +590,14 @@ Checking the case.
 Check the streams listed in the streams text files.  If more or different
 dates need to be added, change the $CASEROOT/user_*files*
 and invoke './preview_namelists' so you can check the information in the
-""" + member.caseroot + """/CaseDocs or
-""" + member.rundir + """ directories.
+""" + member.caseroot_path + """/CaseDocs or
+""" + member.rundir_path + """ directories.
 
 -------------------------------------------------------------------------"""
 
 print(CESM_instructions)
 
-with open(member.caseroot + '/CESM_instructions.txt', 'w') as f:
+with open(member.caseroot_path + '/CESM_instructions.txt', 'w') as f:
         f.write(CESM_instructions)
 
 

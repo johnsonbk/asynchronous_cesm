@@ -54,7 +54,7 @@ class TestCron(unittest.TestCase):
     """
     
     def test_cron(self):
-        test_duration_in_minutes = 0
+        test_duration_in_minutes = 1
         seconds_per_minute = 60
         script = 'write_time_to_file.py'
         output_file = experiment.scripts_path + '/times_written_to_file.txt'
