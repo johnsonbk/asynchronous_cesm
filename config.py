@@ -11,40 +11,40 @@ class Member:
     def __init__(self, index, case):
         self.string = str(index).zfill(4)
         self.name = case.name + '_' + self.string
-        self.caseroot = case.caseroot + '/' + self.name
-        self.scratchroot = case.scratchroot + '/'  + self.name
-        self.rundir = self.scratchroot + '/run'
+        self.caseroot_path = case.caseroot_path + '/' + self.name
+        self.scratchroot_path = case.scratchroot_path + '/'  + self.name
+        self.rundir = self.scratchroot_path + '/run'
 
     def git_init(self):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         system('git init')
         system('git add .')
         system('git commit -m "Initial caseroot commit for ' + self.name + '"')
 
-        chdir(self.scratchroot)
+        chdir(self.scratchroot_path)
         system('git init')
         system('git add .')
         system('git commit -m "Initial runroot commit for ' + self.name + '"')
 
     def git_commit(self):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         system('git add .')
         system('git commit -m "Caseroot commit for ' + self.name + '"')
 
-        chdir(self.scratchroot)
+        chdir(self.scratchroot_path)
         system('git add .')
         system('git commit -m "Runroot commit for ' + self.name + '"')
     
     def git_reset(self):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         system('git reset --hard HEAD^')
 
-        chdir(self.scratchroot)
+        chdir(self.scratchroot_path)
         system('git reset --hard HEAD^')
     
     def check_build_success(self):
-        chdir(self.caseroot)
-        case_status = open(self.caseroot + '/CaseStatus', 'r')
+        chdir(self.caseroot_path)
+        case_status = open(self.caseroot_path + '/CaseStatus', 'r')
         second_to_last_line = case_status.readlines()[-2]
 
         if 'case.build success' in second_to_last_line:
@@ -55,15 +55,15 @@ class Member:
         return build_successful
 
     def xml_change(self, command):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         system('./xmlchange ' + command)
     
     def xml_query(self, command):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         system('./xmlquery ' + command)
 
     def xml_get_value(self, key):
-        chdir(self.caseroot)
+        chdir(self.caseroot_path)
         return check_output('./xmlquery ' + key + ' --value', shell=True).decode('utf-8')
 
 class Experiment:
@@ -96,19 +96,19 @@ class Experiment:
         self.machine = 'derecho'
         self.email_address = 'johnsonb@ucar.edu'
         # Paths
-        self.cesmdata = '/glade/p/cesm/cseg/inputdata'
+        self.cesmdata_path = '/glade/p/cesm/cseg/inputdata'
         self.acom_path = '/gpfs/fs1/p/acom'
-        self.caseroot = '/glade/work/' + user_id + '/cases/' + self.name
-        self.scratchroot = '/glade/scratch/' + user_id + '/' + self.name 
-        self.cesmroot = '/glade/work/' + user_id + '/' + self.cesmtag
-        self.sourcemods = '/glade/u/home/' + user_id + '/' + self.cesmtag + '/SourceMods'
-        self.dartroot = '/glade/work/' + user_id + '/git/DART_derecho'
-        self.baseobsdir = '/glade/p/cisl/dares/Observations/NCEP+ACARS+GPS+AIRS/Thinned_x9x10'
-        self.cimeroot = self.cesmroot + '/cime'
+        self.caseroot_path = '/glade/work/' + user_id + '/cases/' + self.name
+        self.scratchroot_path = '/glade/scratch/' + user_id + '/' + self.name 
+        self.cesmroot_path = '/glade/work/' + user_id + '/' + self.cesmtag
+        self.sourcemods_path = '/glade/u/home/' + user_id + '/' + self.cesmtag + '/SourceMods'
+        self.dartroot_path = '/glade/work/' + user_id + '/git/DART_derecho'
+        self.baseobsdir_path = '/glade/p/cisl/dares/Observations/NCEP+ACARS+GPS+AIRS/Thinned_x9x10'
+        self.cimeroot_path = self.cesmroot_path + '/cime'
         self.use_tasks_per_node = 128
         self.nthreads = 1
-        self.archdir = self.scratchroot + '/' + self.name + '/archive'
-        self.python_path = '/opt/local/bin/python'
+        self.archdir_path = self.scratchroot_path + '/' + self.name + '/archive'
+        self.python_bin = '/opt/local/bin/python'
         self.scripts_path = '/Users/johnsonb/work/git/asynchronous_cesm'
         # DATM
         self.stream_year_align = 2011
@@ -123,7 +123,7 @@ class Experiment:
         self.ref_tod = '00000'
         self.ref_date = self.ref_year + '-' + self.ref_mon + '-' + self.ref_day
         self.ref_timestamp = self.ref_year + '-' + self.ref_mon + '-' + self.ref_day + '-' + self.ref_tod
-        self.ref_stage_dir = '/glade/scratch/' + user_id + self.ref_case + '/rest/' + self.ref_timestamp
+        self.ref_stage_dir_path = '/glade/scratch/' + user_id + self.ref_case + '/rest/' + self.ref_timestamp
         # Job
         self.project = 'ACIS0001'
         self.queue = 'main'

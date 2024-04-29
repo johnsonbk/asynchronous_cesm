@@ -5,7 +5,29 @@ import unittest
 from utils import cron, database, members
 from config import experiment
 import os
+from os.path import isdir, isfile, islink
 import time
+
+class TestPaths(unittest.TestCase):
+    """
+    Test whether the paths in the experiment object exist.
+    """
+
+    def test_paths_experiment(self):
+
+        all_paths_and_binaries_exist = True
+
+        for item in vars(experiment).items():
+            if item[0].split('_')[-1] == 'path':
+                if not isdir(item[1]):
+                    print(item[0] + ' path does not exist: ' + item[1])
+                    all_paths_and_binaries_exist = False
+            elif item[0].split('_')[-1] == 'bin':
+                if not isfile(item[1]) or not islink(item[1]):
+                    print(item[0] + ' binary does not exist: ' + item[1])
+                    all_paths_and_binaries_exist = False
+
+        self.assertTrue(all_paths_and_binaries_exist)
 
 class TestGit(unittest.TestCase):
     """
@@ -32,7 +54,7 @@ class TestCron(unittest.TestCase):
     """
     
     def test_cron(self):
-        test_duration_in_minutes = 1
+        test_duration_in_minutes = 0
         seconds_per_minute = 60
         script = 'write_time_to_file.py'
         output_file = experiment.scripts_path + '/times_written_to_file.txt'

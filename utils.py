@@ -12,11 +12,7 @@ from email.mime.text import MIMEText
 
 from config import experiment, members
 
-def verify_path_exists(path):
-    from os.path import isdir
 
-    if not isdir(path):
-        raise OSError('Path does not exist: ' + path)
 
 class Cron:
     """
@@ -24,7 +20,7 @@ class Cron:
     """
 
     def __init__(self, experiment):
-        self.python_path = experiment.python_path
+        self.python_bin = experiment.python_bin
         self.scripts_path = experiment.scripts_path
 
     def create_job(self, minutes='5', script='check_database.py', experiment=experiment.name):
@@ -34,7 +30,7 @@ class Cron:
         """
         system('crontab -l > ' + self.scripts_path + '/tmp_chrontab')
         f = open(self.scripts_path + '/tmp_chrontab', 'a')
-        f.write('*/' + str(minutes) + ' * * * * ' + self.python_path + ' ' + self.scripts_path + '/' + script + ' ' + experiment + '\n')
+        f.write('*/' + str(minutes) + ' * * * * ' + self.python_bin + ' ' + self.scripts_path + '/' + script + ' ' + experiment + '\n')
         f.close()
         system('crontab ' + self.scripts_path + '/tmp_chrontab')
         system('rm ' + self.scripts_path + '/tmp_chrontab')
@@ -72,7 +68,7 @@ class Database:
     """
 
     def __init__(self, experiment, members):
-        self.name = experiment.caseroot + '/' + 'sqlite3.db'
+        self.name = experiment.caseroot_path + '/' + 'sqlite3.db'
         self.size = experiment.size
         self.members = members
         self.start_year = experiment.start_year
