@@ -12,11 +12,13 @@ from email.mime.text import MIMEText
 
 from config import experiment, members
 
-def verify_path_exists(path):
+def path_exists(path):
     from os.path import isdir
 
-    if not isdir(path):
-        raise OSError('Path does not exist: ' + path)
+    if isdir(path):
+        return True
+    else:
+        return False
 
 class Cron:
     """
@@ -42,7 +44,7 @@ class Cron:
     def cancel_job(self, script='check_database.py', experiment=experiment.name):
         """
         Reads the crontab contents in f1 and writes them to f2 unless the line
-        contains the script and experiment strings. If the line does contain 
+        contains the script and experiment strings. If the line does contain
         these strings, they are not written to f2, which cancels that
         particular job.
         """
@@ -122,7 +124,7 @@ class Database:
         self.cursor.execute(query)
 
         self.connection.commit()
-    
+
     def insert_cycle_record(self, cycle, year, month, day, tod, status):
         query = "INSERT INTO cycles (cycle, year, month, day, tod"
 
@@ -133,7 +135,7 @@ class Database:
 
         for this_member in self.members:
             query += ", '" + status + "' "
-        
+
         query += ")"
 
         self.print_query(query)
@@ -141,7 +143,7 @@ class Database:
         cursor = self.connection.cursor()
         cursor.execute(query)
         self.connection.commit()
-    
+
         return
 
     def select_cycle_record_by_timestamp(self, year, month, day, tod):
@@ -149,7 +151,7 @@ class Database:
         # This gets the newest record with a given timestamp. In general, each record
         # will have a unique timestamp, except cycles 0 and 1 which should have the same timestamp.
         query = "SELECT * FROM cycles WHERE year = " + str(year) + " AND month = " + str(month) + " AND " + "day = " + str(day) + " AND tod = " + str(tod) + " ORDER BY cycle DESC"
-        
+
         self.print_query(query)
 
         cursor = self.connection.cursor()
@@ -182,7 +184,7 @@ class Database:
     def update_status_in_experiment_record(self, cycle, resubmit, status):
 
         query = "UPDATE experiment SET cycle = " + str(cycle) + ", resubmit = " + str(resubmit) + ", status = '" + status + "' WHERE id = 0"
-        
+
         self.print_query(query)
 
         cursor = self.connection.cursor()
@@ -194,7 +196,7 @@ class Database:
     def update_member_status_in_cycle_record(self, cycle, member, status):
 
         query = "UPDATE cycles SET status_of_" + member + " = '" +status + "' WHERE cycle = " + str(cycle)
-        
+
         self.print_query(query)
 
         cursor = self.connection.cursor()
@@ -205,7 +207,7 @@ class Database:
 
     def select_all_member_statuses_in_cycle_record(self, cycle):
         # This method returns a dictionary where the keys are the member string
-        # for each member of the ensemble and the values are the status of 
+        # for each member of the ensemble and the values are the status of
         # that member.
 
         query = "SELECT "
@@ -214,16 +216,16 @@ class Database:
                 query += "status_of_" + this_member.string + ", "
             else:
                 query += "status_of_" + this_member.string + " "
-        
+
         query += " FROM cycles WHERE cycle  = " + str(cycle)
-        
+
         self.print_query(query)
 
         cursor = self.connection.cursor()
         cursor.execute(query)
         record = cursor.fetchone()
 
-        # Create a dictionary where the keys are the member string and the 
+        # Create a dictionary where the keys are the member string and the
         # values are the statuses of the member
         statuses = {}
 
@@ -241,7 +243,7 @@ class Message:
 
     def __init__(self, experiment):
         self.email_address = experiment.email_address
-    
+
     def send(self, subject, content):
 
         msg = MIMEText(content)

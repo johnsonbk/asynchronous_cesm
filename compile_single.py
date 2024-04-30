@@ -4,7 +4,7 @@ from __future__ import print_function
 import os
 import sys
 from config import experiment, members
-from utils import database, message, verify_path_exists
+from utils import database, message, path_exists
 
 # ---------------------
 # Purpose
@@ -371,11 +371,12 @@ if continue_run == 'TRUE':
     print("Staging restart files for run date/time: " + experiment.restart_timestamp)
 
     if archived == 'TRUE':
-    
-        # Check if the stage directory exists
-        verify_path_exists(experiment.restart_dir)
-        os.system('cp ' + member.restart_dir + '/*' + member.string + '* ' + member.rundir)
 
+        # Check if the stage directory exists
+        if path_exists(experiment.restart_dir):
+           os.system('cp ' + member.restart_dir + '/*' + member.string + '* ' + member.rundir)
+        else:
+            raise OSError('Path does not exist: ' + experiment.restart_dir)
     else:
 
         with open(member.caseroot + '/rpointer.atm', 'w') as f:
@@ -398,7 +399,7 @@ if continue_run == 'TRUE':
         with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
             f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write('RESTART_FMT=nc')
-        
+
         if os.path.isfile(member.caseroot + '/rpointer.ocn.tavg'):
             with open(member.caseroot + '/rpointer.ocn.tavg', 'w') as f:
                 f.write(experiment.name + '.pop_' + member.string + '.rh.' + experiment.restart_timestamp + '.nc')
@@ -427,13 +428,13 @@ else:
     os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
     os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
     os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
-    
+
     with open(member.caseroot + '/rpointer.ocn.ovf', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
 
     with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc\n')
-        f.write('RESTART_FMT=nc')   
+        f.write('RESTART_FMT=nc')
 
     print('All files set to run the FIRST experiment step at time' + experiment.start_timestamp)
 
@@ -468,7 +469,7 @@ files = [f for f in os.listdir('./CaseDocs') if 'streams' in f]
 for f in files:
     # BKJ ":t" in the line below is just the tail of the file
     # set FNAME = $FILE:t
-    
+
     if 'presaero' in f:
         print('Using default prescribed aerosol stream.txt file' + f)
     elif 'diatren' in f:
