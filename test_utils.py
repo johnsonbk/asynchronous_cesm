@@ -43,7 +43,7 @@ class TestCron(unittest.TestCase):
     Test the cron class by creating a new cronjob in the crontab to run the
     ``write_time_to_file.py`` script. Whenever that script is run, it simply
     writes the current time to the text file specified by the ``output_file``
-    variable. The cron job is run once a minute and the test is paused for 
+    variable. The cron job is run once a minute and the test is paused for
     a set number of minutes, specified by the ``test_duration_in_minutes``
     variable. If the number of lines in the ``output_file`` matches the number
     of minutes the test has been paused then the test passes.
@@ -52,7 +52,7 @@ class TestCron(unittest.TestCase):
     the test suite multiple times and don't want to wait for test_cron to pass
     each time, set ``test_duration_in_minutes = 0`` and the test will pass.
     """
-    
+
     def test_cron(self):
         test_duration_in_minutes = 1
         seconds_per_minute = 60
@@ -63,7 +63,7 @@ class TestCron(unittest.TestCase):
         open(output_file, 'w').close()
 
         print('Running test_cron, which will pause test_utils.py for ' + str(test_duration_in_minutes) + ' minute(s).')
-        
+
         if test_duration_in_minutes != 0:
             # Create a cron job that is run every minute
             cron.create_job(1, script, output_file)
@@ -98,7 +98,7 @@ class TestDatabase(unittest.TestCase):
     def tearDownClass(cls):
         print('Removing database saved in ' + database.name)
         os.remove(database.name)
-        
+
     def test_database(self):
 
         with database as db:
@@ -141,7 +141,7 @@ class TestDatabase(unittest.TestCase):
             returned_status = db.select_member_status_in_cycle_record(cycle, members[0].string)
 
             self.assertEqual(returned_status, new_status)
- 
+
             record = db.select_experiment_record()
             self.assertEqual(record['cycle'], 0)
 
@@ -151,6 +151,6 @@ class TestDatabase(unittest.TestCase):
             db.update_status_in_experiment_record(cycle, resubmit, experiment_status)
             record = db.select_experiment_record()
             self.assertEqual(record['status'], experiment_status)
-    
+
 if __name__ == '__main__':
     unittest.main()

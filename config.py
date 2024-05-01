@@ -75,7 +75,7 @@ class Experiment:
     def __init__(self):
         # Case config
         self.name = 'GIAF'
-        self.size = 4
+        self.size = 3
         self.compset = 'GIAF'
         self.resolution = 'f09_g17'
         self.compset_args = ' --compset ' + self.compset + ' --run-unsupported '

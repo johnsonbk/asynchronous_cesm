@@ -65,13 +65,13 @@ member.xml_change('INFO_DBUG=0')
 print('experiment.sourcemods', experiment.sourcemods_path)
 os.system('ls '+experiment.sourcemods_path)
 if path_exists(experiment.sourcemods_path):
-    os.system('cp -R ' + experiment.sourcemods + '/* ' + member.caseroot + '/SourceMods')
+    os.system('cp -R ' + experiment.sourcemods_path + '/* ' + member.caseroot_path + '/SourceMods')
 else:
     print('No SourceMods for this case.')
 
-member.xml_change('RUN_REFDIR=' + experiment.ref_stage_dir)
+member.xml_change('RUN_REFDIR=' + experiment.ref_stage_dir_path)
 
-os.system('cd ' + member_root)
+os.system('cd ' + member.caseroot_path)
 
 try:
     os.system('./case.setup')
@@ -134,7 +134,7 @@ user_datm_streams_txt_CPLHISTForcing_Solar = """<dataSource>
     </offset>
 </fieldInfo>"""
 
-f = open(member.caseroot+"/user_datm.streams.txt.CPLHISTForcing.Solar", "w")
+f = open(member.caseroot_path+"/user_datm.streams.txt.CPLHISTForcing.Solar", "w")
 f.write(user_datm_streams_txt_CPLHISTForcing_Solar)
 f.close()
 
@@ -189,11 +189,11 @@ user_datm_streams_txt_CPLHISTForcing_State1hr = """<dataSource>
     </offset>
 </fieldInfo>"""
 
-f = open(member.caseroot+"/user_datm.streams.txt.CPLHISTForcing.State1hr", "w")
+f = open(member.caseroot_path+"/user_datm.streams.txt.CPLHISTForcing.State1hr", "w")
 f.write(user_datm_streams_txt_CPLHISTForcing_State1hr)
 f.close()
 
-user_datm.streams.txt.CPLHISTForcing.State3hr = """<dataSource>
+user_datm_streams_txt_CPLHISTForcing_State3hr = """<dataSource>
     The CAM6-DART Ensemble Reanalysis (NCAR RDA ds345.0) contains
     DATM forcing files particularly appropriate for CESM experiments.
     https://rda.ucar.edu/datasets/ds345.0
@@ -250,7 +250,7 @@ user_datm.streams.txt.CPLHISTForcing.State3hr = """<dataSource>
     </offset>
 </fieldInfo>"""
 
-f = open(member.caseroot+"/user_datm.streams.txt.CPLHISTForcing.State3hr", "w")
+f = open(member.caseroot_path+"/user_datm.streams.txt.CPLHISTForcing.State3hr", "w")
 f.write(user_datm_streams_txt_CPLHISTForcing_State3hr)
 f.close()
 
@@ -305,7 +305,7 @@ user_datm_streams_txt_CPLHISTForcing_nonSolarFlux = """<dataSource>
     </offset>
 </fieldInfo>"""
 
-f = open(member.caseroot+"/user_datm.streams.txt.CPLHISTForcing.nonSolarFlux", "w")
+f = open(member.caseroot_path+"/user_datm.streams.txt.CPLHISTForcing.nonSolarFlux", "w")
 f.write(user_datm_streams_txt_CPLHISTForcing_nonSolarFlux)
 f.close()
 
@@ -324,21 +324,21 @@ tintalgo = 'linear','linear'
 restfils = 'unset'
 restfilm = 'unset'
 """
-f = open(member.caseroot+"/user_nl_datm", "a")
+f = open(member.caseroot_path+"/user_nl_datm", "a")
 f.write(user_nl_datm)
 f.close()
 
 user_nl_cice = """
 ice_ic = '""" + member.rundir + """/""" + experiment.ref_case + """.cice_"""+ member.string + """.r.""" + experiment.ref_timestamp + """.nc'
 """
-f = open(member.caseroot+"/user_nl_cice", "a")
+f = open(member.caseroot_path+"/user_nl_cice", "a")
 f.write(user_nl_cice)
 f.close()
 
 user_nl_pop = """
 init_ts_suboption  = 'data_assim'
 """
-f = open(member.caseroot+"/user_nl_pop", "a")
+f = open(member.caseroot_path+"/user_nl_pop", "a")
 f.write(user_nl_pop)
 f.close()
 
@@ -374,41 +374,41 @@ if continue_run == 'TRUE':
 
         # Check if the stage directory exists
         if path_exists(experiment.restart_dir):
-           os.system('cp ' + member.restart_dir + '/*' + member.string + '* ' + member.rundir)
+           os.system('cp ' + experiment.restart_dir + '/*' + member.string + '* ' + member.rundir)
         else:
             raise OSError('Path does not exist: ' + experiment.restart_dir)
     else:
 
-        with open(member.caseroot + '/rpointer.atm', 'w') as f:
+        with open(member.caseroot_path + '/rpointer.atm', 'w') as f:
             f.write(experiment.name + '.datm_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write(experiment.name + '.datm_' + member.string + '.rs1.' + experiment.restart_timestamp + '.bin\n')
 
-        with open(member.caseroot + '/rpointer.rof', 'w') as f:
+        with open(member.caseroot_path + '/rpointer.rof', 'w') as f:
             f.write(experiment.name + '.drof_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write(experiment.name + '.drof_' + member.string + '.rs1.' + experiment.restart_timestamp + '.bin\n')
 
-        with open(member.caseroot + '/rpointer.ice', 'w') as f:
+        with open(member.caseroot_path + '/rpointer.ice', 'w') as f:
             f.write(experiment.name + '.cice_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write(experiment.name + '.drof_' + member.string + '.rs1.' + experiment.restart_timestamp + '.nc\n')
 
         # The ovf restart is only needed for the low-resolution g17 run
         if 'g17' in experiment.resolution:
-            with open(member.caseroot + '/rpointer.ocn.ovf', 'w') as f:
+            with open(member.caseroot_path + '/rpointer.ocn.ovf', 'w') as f:
                 f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.restart_timestamp)
 
-        with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
+        with open(member.caseroot_path + '/rpointer.ocn.restart', 'w') as f:
             f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.restart_timestamp + '.nc\n')
             f.write('RESTART_FMT=nc')
 
-        if os.path.isfile(member.caseroot + '/rpointer.ocn.tavg'):
+        if os.path.isfile(member.caseroot_path + '/rpointer.ocn.tavg'):
             with open(member.caseroot + '/rpointer.ocn.tavg', 'w') as f:
                 f.write(experiment.name + '.pop_' + member.string + '.rh.' + experiment.restart_timestamp + '.nc')
 
-        if os.path.isfile(member.caseroot + '/rpointer.ocn.tavg2'):
+        if os.path.isfile(member.caseroot_path + '/rpointer.ocn.tavg2'):
             with open(member.caseroot + '/rpointer.ocn.tavg2', 'w') as f:
                 f.write(experiment.name + '.pop_' + member.string + '.rh.nday1.' + experiment.restart_timestamp + '.nc')
 
-        with open(member.caseroot + '/rpointer.drv', 'w') as f:
+        with open(member.caseroot_path + '/rpointer.drv', 'w') as f:
             f.write(experiment.name + '.cpl.r.' + experiment.restart_timestamp + '.nc')
 
     print('All files reset to rerun experiment step for time ' + experiment.restart_timestamp + '.')
@@ -416,23 +416,23 @@ if continue_run == 'TRUE':
 # Else CONTINUE_RUN == 'FALSE'
 else:
 
-    os.system('rm ' + member.caseroot + '/rpointer.atm_????')
-    os.system('rm ' + member.caseroot + '/rpointer.ice_????')
-    os.system('rm ' + member.caseroot + '/rpointer.ocn_????.tavg')
-    os.system('rm ' + member.caseroot + '/rpointer.drv')
-    os.system('rm ' + member.caseroot + '/rpointer.rof')
+    os.system('rm ' + member.caseroot_path + '/rpointer.atm_????')
+    os.system('rm ' + member.caseroot_path + '/rpointer.ice_????')
+    os.system('rm ' + member.caseroot_path + '/rpointer.ocn_????.tavg')
+    os.system('rm ' + member.caseroot_path + '/rpointer.drv')
+    os.system('rm ' + member.caseroot_path + '/rpointer.rof')
 
     print('Staging initial files for instance ' + member.string)
 
     # The cice fname must match that in the user_nl_cice file
-    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
-    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
-    os.system('ln ' + experiment.ref_stage_dir + '/' + experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
+    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
+    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
+    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
 
-    with open(member.caseroot + '/rpointer.ocn.ovf', 'w') as f:
+    with open(member.caseroot_path + '/rpointer.ocn.ovf', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
 
-    with open(member.caseroot + '/rpointer.ocn.restart', 'w') as f:
+    with open(member.caseroot_path + '/rpointer.ocn.restart', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc\n')
         f.write('RESTART_FMT=nc')
 
@@ -453,12 +453,12 @@ else:
 print('To create custom stream files we:')
 print('1. Use preview_namelists to obtain the contents of the stream txt files')
 print('in CaseDocs, and then place a copy of the modified stream txt file in')
-print(member.caseroot + ' with the string user_ prepended, and')
+print(member.caseroot_path + ' with the string user_ prepended, and')
 print('2. Copy a template stream txt file from this directory:')
-print(experiment.dartroot + '/models/POP/shell_scripts/' + experiment.cesmtagmajor)
+print(experiment.dartroot_path + '/models/POP/shell_scripts/' + experiment.cesmtagmajor)
 print('and modify one for each instance.')
 
-os.system(member.caseroot + '/preview_namelists')
+os.system(member.caseroot_path + '/preview_namelists')
 
 # This gives us a stream txt file for each instance that we can
 # modify for our own purpose.
@@ -527,20 +527,21 @@ for f in files:
 # ==============================================================================
 # Building the case.
 # ==============================================================================
-
+print("\nSetting up the case.\n")
+os.system(member.caseroot_path + '/case.setup')
 print("\nBuilding the case.\n")
-os.system(member.caseroot + '/case.build')
+os.system(member.caseroot_path + '/case.build')
 
 build_successful = member.check_build_success()
 
 member.git_init()
 member.git_commit()
 
-if build_successful:
-    database.update_status_of_member(0, member.string, 'completed building')
-
-else:
-    database.update_status_of_member(0, member.string, 'failed building')
+with database as db:
+    if build_successful:
+        db.update_member_status_in_cycle_record(0, member.string, 'completed building')
+    else:
+        db.update_member_status_in_cycle_record(0, member.string, 'failed building')
 
 # ==============================================================================
 # Checking the case.
@@ -555,11 +556,11 @@ Checking the case.
    and check the compatibility between the namelists/pointer
    files and the files that were staged.
 
-2) cd """ + member.caseroot + """
+2) cd """ + member.caseroot_path + """
 
 3) The case is initially configured to do NO ASSIMILATION.
    When you are ready to add data assimilation, configure and execute
-   the """ + member.caseroot + """/CESM_DART_config.csh script.
+   the """ + member.caseroot_path + """/CESM_DART_config.csh script.
 
 4) The very first CESM advance (i.e. CONTINUE_RUN=FALSE)
    STOP_N must be longer than *AT LEAST 2 TIMES* the coupling
@@ -592,7 +593,7 @@ Check the streams listed in the streams text files.  If more or different
 dates need to be added, change the $CASEROOT/user_*files*
 and invoke './preview_namelists' so you can check the information in the
 """ + member.caseroot_path + """/CaseDocs or
-""" + member.rundir_path + """ directories.
+""" + member.rundir + """ directories.
 
 -------------------------------------------------------------------------"""
 
@@ -639,7 +640,7 @@ with open(member.caseroot_path + '/CESM_instructions.txt', 'w') as f:
 # elif comp_rof == 'mosart':
 #     os.system('ln -f ' + case.ref_stage_dir + '/' + case.ref_case + '.mosart_'+ member.string +'.r.' + case.ref_timestamp + '.nc ' + rundir)
 
-# os.system('cd '+ member_root)
+# os.system('cd '+ member.caseroot_path)
 # os.system('./case.build --skip-provenance-check')
 
 # # Check the case status
