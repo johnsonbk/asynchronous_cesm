@@ -88,7 +88,6 @@ class Experiment:
         self.start_timestamp = self.start_year + '-' + self.start_month + '-' + self.start_day + '-' + self.start_tod
         # Restart timestamp is only used to fix a broken run, so by default it is sent to None
         self.restart_timestamp = None
-        self.restart_dir = None
         self.stop_option = 'nhours'
         self.stop_n = '6'
         self.short_term_archiver = 'off'

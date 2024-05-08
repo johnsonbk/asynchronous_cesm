@@ -373,10 +373,10 @@ if continue_run == 'TRUE':
     if archived == 'TRUE':
 
         # Check if the stage directory exists
-        if path_exists(experiment.restart_dir):
-           os.system('cp ' + experiment.restart_dir + '/*' + member.string + '* ' + member.rundir)
+        if path_exists(experiment.ref_stage_dir_path):
+           os.system('cp ' + experiment.ref_stage_dir_path + '/*' + member.string + '* ' + member.rundir)
         else:
-            raise OSError('Path does not exist: ' + experiment.restart_dir)
+            raise OSError('Path does not exist: ' + experiment.ref_stage_dir_path)
     else:
 
         with open(member.caseroot_path + '/rpointer.atm', 'w') as f:
