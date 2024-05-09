@@ -81,7 +81,7 @@ class Experiment:
         self.compset_args = ' --compset ' + self.compset + ' --run-unsupported '
         self.cesmtag = 'cesm2_1_3'
         self.cesmtagmajor = 'cesm2_1'
-        self.start_year = '2018'
+        self.start_year = '2011'
         self.start_month = '01'
         self.start_day = '01'
         self.start_tod = '00000'
@@ -117,7 +117,7 @@ class Experiment:
 
         # Reference
         self.ref_case = 'g210.G_JRA.v14.gx1v7.01'
-        self.ref_year = '2010'
+        self.ref_year = '2011'
         self.ref_mon = '01'
         self.ref_day = '01'
         self.ref_tod = '00000'

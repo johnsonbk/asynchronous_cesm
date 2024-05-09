@@ -425,14 +425,23 @@ else:
     print('Staging initial files for instance ' + member.string)
 
     # The cice fname must match that in the user_nl_cice file
-    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
-    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc')
-    os.system('ln ' + experiment.ref_stage_dir_path + '/' + experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
+    cice_filename = experiment.ref_case + '.cice_' + member.string + '.r.' + experiment.start_timestamp + '.nc'
+    command = 'ln -s ' + experiment.ref_stage_dir_path + '/' + cice_filename + ' ' + member.rundir + '/' + cice_filename
+    print(command)
+    os.system(command)
+    pop_filename = experiment.ref_case + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc'
+    command = 'ln -s ' + experiment.ref_stage_dir_path + '/' + pop_filename + ' ' + member.rundir + '/' + pop_filename
+    print(command)
+    os.system(command)
+    popro_filename = experiment.ref_case + '.pop_' + member.string + '.ro.' + experiment.start_timestamp
+    command = 'ln -s ' + experiment.ref_stage_dir_path + '/' + popro_filename + ' ' + member.rundir + '/' + popro_filename
+    print(command)
+    os.system(command)
 
-    with open(member.caseroot_path + '/rpointer.ocn.ovf', 'w') as f:
+    with open(member.rundir + '/rpointer.ocn.ovf', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.ro.' + experiment.start_timestamp)
 
-    with open(member.caseroot_path + '/rpointer.ocn.restart', 'w') as f:
+    with open(member.rundir + '/rpointer.ocn.restart', 'w') as f:
         f.write(experiment.name + '.pop_' + member.string + '.r.' + experiment.start_timestamp + '.nc\n')
         f.write('RESTART_FMT=nc')
 
