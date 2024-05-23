@@ -10,24 +10,28 @@ import time
 
 class TestPaths(unittest.TestCase):
     """
-    Test whether the paths in the experiment object exist.
+    Test whether the paths, binaries and files in the experiment object exist.
     """
 
     def test_paths_experiment(self):
 
-        all_paths_and_binaries_exist = True
+        all_paths_and_files_exist = True
 
         for item in vars(experiment).items():
             if item[0].split('_')[-1] == 'path':
                 if not isdir(item[1]):
                     print(item[0] + ' path does not exist: ' + item[1])
-                    all_paths_and_binaries_exist = False
+                    all_paths_and_files_exist = False
             elif item[0].split('_')[-1] == 'bin':
-                if not isfile(item[1]) or not islink(item[1]):
+                if not isfile(item[1]) and not islink(item[1]):
                     print(item[0] + ' binary does not exist: ' + item[1])
-                    all_paths_and_binaries_exist = False
+                    all_paths_and_files_exist = False
+            elif item[0].split('_')[-1] == 'file':
+                if not isfile(item[1]) and not islink(item[1]):
+                    print(item[0] + ' file does not exist: ' + item[1])
+                    all_paths_and_files_exist = False
 
-        self.assertTrue(all_paths_and_binaries_exist)
+        self.assertTrue(all_paths_and_files_exist)
 
 class TestGit(unittest.TestCase):
     """

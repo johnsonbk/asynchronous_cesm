@@ -103,6 +103,7 @@ class Experiment:
         self.cesmroot_path = '/glade/work/' + user_id + '/' + self.cesmtag
         self.sourcemods_path = '/glade/u/home/' + user_id + '/' + self.cesmtag + '/SourceMods'
         self.dartroot_path = '/glade/work/' + user_id + '/git/DART_derecho'
+        self.input_nml_file = self.dartroot_path + '/models/POP/work/input.nml'
         self.baseobsdir_path = '/glade/p/cisl/dares/Observations/NCEP+ACARS+GPS+AIRS/Thinned_x9x10'
         self.cimeroot_path = self.cesmroot_path + '/cime'
         self.use_tasks_per_node = 128
