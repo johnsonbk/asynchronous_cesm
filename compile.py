@@ -12,6 +12,7 @@ if not os.path.exists(experiment.caseroot_path):
 
 with database as db:
     db.create_tables()
+    db.insert_cycle_record(0, experiment.start_year, experiment.start_month, experiment.start_day, experiment.start_tod, 'building')
 
 # Declare a job string
 
@@ -31,7 +32,7 @@ job_string = """#!/bin/bash -l
 #PBS -k eod
 #PBS -m abe
 #PBS -M {}
-#PBS -l select=1:ncpus=36:mpiprocs=36
+#PBS -l select=1:ncpus=128:mpiprocs=128
 
 {}
 """
