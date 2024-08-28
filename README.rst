@@ -141,10 +141,10 @@ If so, then integrate will submit a job to begin an integration.
 Test-driven development
 -----------------------
 
-Since these codes are meant to be run asynchronously on a distributed computing system, it is
-difficult to ensure whether they work as intended. Therefore a suite of comprehensive tests is
-included with the code that can be used to help ensure the code still works as intended when it is
-modified.
+Since these codes are meant to be run asynchronously on a distributed computing system, it isn't
+straightforward to ensure whether they work as intended. Therefore a suite of comprehensive tests
+is included with the code that can be used to help ensure the code still works as intended when it
+is modified.
 
 The test suite uses Python's standard `unittest <https://docs.python.org/3/library/unittest.html>`_
 testing framework.
@@ -179,3 +179,4 @@ watch `Corey Schafer's tutorial on YouTube <https://www.youtube.com/watch?v=6tNS
 
    You'll be prompted to select a text editor and an empty file will open. Save
    the file.
+
